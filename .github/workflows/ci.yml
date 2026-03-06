@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,17 +16,43 @@ jobs:
           node-version: '20'
 
       - name: Install Dependencies
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Run Lint
-        run: |
-          npm run lint
+        run: npm run lint
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Run Tests
-        run: |
-          npm test
+        run: npm test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Build
-        run: |
-          npm run build
+        run: npm run build
+
+      - name: Output Github context
+        run: echo "${{ toJson(github) }}"
+
